@@ -1,6 +1,7 @@
 import pickle
 import pandas as pd
 import streamlit as st
+from sklearn.preprocessing import OneHotEncoder
 
 # Función para cargar los modelos
 def cargar_modelo(modelo_path):
@@ -83,20 +84,26 @@ with st.form(key='prediccion_form'):
 # Verificar si se ha enviado el formulario
 if submit_button:
     if piloto and pista:
-        # Aquí debes crear el dataframe basado en el nombre del piloto y la pista seleccionada
-        # Por simplicidad, vamos a crear un dataframe de ejemplo
+        # Crear el dataframe con las características adicionales necesarias
         datos = pd.DataFrame({
-            'piloto': [piloto],
-            'pista': [pista],
-            'caracteristica1': [1],  # Reemplaza con las características reales
-            'caracteristica2': [2],
-            'caracteristica3': [3],
-            # Agrega más características necesarias
+            'ID': [f'ID_{piloto.upper()}'],
+            'PISTA': [f'PISTA_{pista.upper()}']
+            # Asegúrate de agregar aquí las características adicionales que necesita tu modelo
         })
 
+        # Aplicar One-Hot Encoding a las columnas de texto
+        onehot_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
+        encoded_columns = onehot_encoder.fit_transform(datos[['ID', 'PISTA']])
+        
+        # Crear un dataframe con las columnas codificadas
+        encoded_df = pd.DataFrame(encoded_columns, columns=onehot_encoder.get_feature_names_out(['ID', 'PISTA']))
+
+        # Concatenar las características adicionales con las columnas codificadas
+        datos_encoded = pd.concat([encoded_df], axis=1)
+
         # Hacer predicciones
-        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
-        resultado_pos = hacer_prediccion(modelo_pos, datos.values)
+        resultado_fast2 = hacer_prediccion(modelo_fast2, datos_encoded)
+        resultado_pos = hacer_prediccion(modelo_pos, datos_encoded)
 
         # Mostrar resultados
         st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
