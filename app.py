@@ -11,6 +11,9 @@ except FileNotFoundError:
 except Exception as e:
     st.error(f"Error al cargar dataframe_con_predicciones.csv: {e}")
 
+# Remover nombres de las características
+data_values = data.values
+
 # Cargar los modelos
 modelo_fast2 = None
 modelo_pos = None
@@ -56,14 +59,14 @@ if modelo_fast2 is None or modelo_pos is None:
 # Ejemplo de uso de la función de predicción
 if modelo_fast2 is not None:
     try:
-        resultado_fast2 = hacer_prediccion(modelo_fast2, data)
+        resultado_fast2 = hacer_prediccion(modelo_fast2, data_values)
         st.write("Resultados del modelo rápido:", resultado_fast2)
     except Exception as e:
         st.error(f"Error al hacer predicción con modelo_fast2: {e}")
 
 if modelo_pos is not None:
     try:
-        resultado_pos = hacer_prediccion(modelo_pos, data)
+        resultado_pos = hacer_prediccion(modelo_pos, data_values)
         st.write("Resultados del modelo posicional:", resultado_pos)
     except Exception as e:
         st.error(f"Error al hacer predicción con modelo_pos: {e}")
