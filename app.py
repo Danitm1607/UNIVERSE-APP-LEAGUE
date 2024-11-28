@@ -5,6 +5,7 @@ import streamlit as st
 # Cargar el dataframe
 try:
     data = pd.read_csv('dataframe_con_predicciones.csv')
+    st.write("Dataframe cargado correctamente")
 except FileNotFoundError:
     st.error("No se encontró el archivo dataframe_con_predicciones.csv")
 except Exception as e:
@@ -17,6 +18,7 @@ modelo_pos = None
 try:
     with open('modelo_fast2.pkl', 'rb') as file:
         modelo_fast2 = pickle.load(file)
+    st.write("Modelo fast2 cargado correctamente")
 except FileNotFoundError:
     st.error("No se encontró el archivo modelo_fast2.pkl")
 except Exception as e:
@@ -25,6 +27,7 @@ except Exception as e:
 try:
     with open('modelo_pos.pkl', 'rb') as file:
         modelo_pos = pickle.load(file)
+    st.write("Modelo pos cargado correctamente")
 except FileNotFoundError:
     st.error("No se encontró el archivo modelo_pos.pkl")
 except Exception as e:
@@ -33,7 +36,12 @@ except Exception as e:
 # Función para hacer predicciones
 def hacer_prediccion(modelo, datos):
     if modelo is not None:
-        return modelo.predict(datos)
+        try:
+            return modelo.predict(datos)
+        except AttributeError as e:
+            st.error(f"El objeto no es un modelo de sklearn: {e}")
+        except Exception as e:
+            st.error(f"Error al hacer predicción: {e}")
     else:
         return "Modelo no cargado correctamente"
 
@@ -41,15 +49,21 @@ def hacer_prediccion(modelo, datos):
 st.title("Predicciones de Machine Learning")
 st.write("Aquí puedes ingresar datos para obtener predicciones.")
 
-# Ejemplo de uso de la función de predicción
-try:
-    resultado_fast2 = hacer_prediccion(modelo_fast2, data)
-    st.write("Resultados del modelo rápido:", resultado_fast2)
-except Exception as e:
-    st.error(f"Error al hacer predicción con modelo_fast2: {e}")
+# Verificar si los modelos son cargados correctamente
+if modelo_fast2 is None or modelo_pos is None:
+    st.error("Uno o ambos modelos no se cargaron correctamente. Por favor verifica los archivos.")
 
-try:
-    resultado_pos = hacer_prediccion(modelo_pos, data)
-    st.write("Resultados del modelo posicional:", resultado_pos)
-except Exception as e:
-    st.error(f"Error al hacer predicción con modelo_pos: {e}")
+# Ejemplo de uso de la función de predicción
+if modelo_fast2 is not None:
+    try:
+        resultado_fast2 = hacer_prediccion(modelo_fast2, data)
+        st.write("Resultados del modelo rápido:", resultado_fast2)
+    except Exception as e:
+        st.error(f"Error al hacer predicción con modelo_fast2: {e}")
+
+if modelo_pos is not None:
+    try:
+        resultado_pos = hacer_prediccion(modelo_pos, data)
+        st.write("Resultados del modelo posicional:", resultado_pos)
+    except Exception as e:
+        st.error(f"Error al hacer predicción con modelo_pos: {e}")
