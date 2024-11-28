@@ -2,14 +2,14 @@ import pickle
 import pandas as pd
 import streamlit as st
 
-# Cargar el dataframe
+# Cargar el dataframe ajustado
 try:
-    data = pd.read_csv('dataframe_con_predicciones.csv')
+    data = pd.read_csv('dataframe_con_predicciones_ajustado.csv')
     st.write("Dataframe cargado correctamente")
 except FileNotFoundError:
-    st.error("No se encontró el archivo dataframe_con_predicciones.csv")
+    st.error("No se encontró el archivo dataframe_con_predicciones_ajustado.csv")
 except Exception as e:
-    st.error(f"Error al cargar dataframe_con_predicciones.csv: {e}")
+    st.error(f"Error al cargar dataframe_con_predicciones_ajustado.csv: {e}")
 
 # Remover nombres de las características
 data_values = data.values
