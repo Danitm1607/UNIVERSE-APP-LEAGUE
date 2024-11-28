@@ -95,7 +95,7 @@ if submit_button:
         })
 
         # Aplicar One-Hot Encoding a las columnas de texto
-        onehot_encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+        onehot_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
         encoded_columns = onehot_encoder.fit_transform(datos[['piloto', 'pista']])
         
         # Crear un dataframe con las columnas codificadas
