@@ -24,7 +24,7 @@ def convertir_tiempo(segundos):
 st.title("Predicciones de F1")
 
 # Leer el archivo de datos para obtener las opciones de ID y PISTA
-df = pd.read_csv('databaseuniverse.csv', delimiter=';')
+df = pd.read_csv('databaseuniverse (1).csv', delimiter=';')
 
 # Formulario de entrada
 with st.form(key='prediccion_form'):
