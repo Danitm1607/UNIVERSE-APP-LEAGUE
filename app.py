@@ -103,4 +103,10 @@ if submit_button:
 
         # Hacer predicciones
         resultado_fast2 = hacer_prediccion(modelo_fast2, datos_encoded)
-        resultado_pos = hacer_prediccion(modelo_pos,
+        resultado_pos = hacer_prediccion(modelo_pos, datos_encoded)
+
+        # Mostrar resultados
+        st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
+        st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
+    else:
+        st.error("Por favor, ingresa el nombre del piloto y selecciona una pista.")
