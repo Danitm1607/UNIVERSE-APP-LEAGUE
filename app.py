@@ -55,46 +55,12 @@ if submit_button:
                            'VICTORIAS TOTALES F2', 'VICTORIAS TOTALES F3', 'PODIOS TOTALES UNIVERSE', 'PODIOS TOTALES UNIVERSE F1',
                            'PODIOS TOTALES UNIVERSE F2', 'PODIOS TOTALES UNIVERSE F3']
     
-    # Asegurarse de que el DataFrame tiene todas las columnas necesarias y en el mismo orden
+    # Asegurarse de que el DataFrame tiene todas las columnas necesarias
     datos = datos[columnas_necesarias]
 
-    # Verificar que el DataFrame no tiene valores nulos
-    if datos.isnull().values.any():
-        st.error("Hay valores nulos en los datos de entrada. Por favor, revise los datos y vuelva a intentarlo.")
-    else:
-        try:
-            resultado_pos = hacer_prediccion(modelo_pos, datos)
-            resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
+    resultado_pos = hacer_prediccion(modelo_pos, datos)
+    resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
 
-            # Mostrar los resultados
-            st.write(f"Predicción de posición para ID {piloto_id} en {pista}: {resultado_pos[0]}")
-            st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {resultado_fast2[0]} segundos")
-
-            # Opcional: Comparar con otros pilotos
-            comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
-            if len(comparar) > 1:
-                comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
-                comparacion_datos = comparacion_datos[columnas_necesarias]
-                comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
-                comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
-                
-                # Mostrar la comparación
-                comparacion_datos['Predicción de Posición'] = comparacion_pos
-                comparacion_datos['Predicción de Tiempo de Vuelta'] = comparacion_fast2
-                
-                st.write("Comparación de Predicciones:")
-                st.dataframe(comparacion_datos[['ID', 'Predicción de Posición', 'Predicción de Tiempo de Vuelta']])
-                
-                # Gráfico de Comparación
-                fig, ax = plt.subplots()
-                for id_piloto in comparar:
-                    datos_piloto = comparacion_datos[comparacion_datos['ID'] == id_piloto]
-                    ax.plot(datos_piloto['PISTA'], datos_piloto['Predicción de Tiempo de Vuelta'], marker='o', label=id_piloto)
-                
-                ax.set_title("Comparación de Tiempos de Vuelta")
-                ax.set_xlabel("Pista")
-                ax.set_ylabel("Tiempo de Vuelta (segundos)")
-                ax.legend()
-                st.pyplot(fig)
-        except ValueError as e:
-            st.error(f"Error al hacer la predicción: {e}")
+    # Mostrar los resultados
+    st.write(f"Predicción de posición para ID {piloto_id} en {pista}: {resultado_pos[0]}")
+    st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {resultado_fast2[0]} segundos")
