@@ -14,9 +14,6 @@ with open('Modelo_ML_Fast2.pkl', 'rb') as file:
 def hacer_prediccion(modelo, datos):
     return modelo.predict(datos)
 
-# Historial de Predicciones
-historial_predicciones = []
-
 # Interfaz de Streamlit
 st.title("Predicciones de F1")
 
@@ -28,7 +25,6 @@ with st.form(key='prediccion_form'):
     piloto_id = st.selectbox("Selecciona el ID del Piloto", df['ID'].unique())
     pista = st.selectbox("Selecciona la Pista", df['PISTA'].unique())
     categoria = st.selectbox("Selecciona la Categoría", df['CAT.'].unique())
-    parametro_modelo = st.slider("Ajustar Parámetro del Modelo", min_value=0.1, max_value=2.0, step=0.1, value=1.0)
     submit_button = st.form_submit_button(label='Hacer Predicción')
 
 # Procesar formulario
@@ -48,7 +44,7 @@ if submit_button:
                            'DIF VUELTAS CARRERA', 'PROMEDIO VUELTA PILOTO POR PISTA', 'MEJOR TIEMPO PILOTO PISTA',
                            'PEOR TIEMPO PILOTO PISTA', 'FRECUENCIA DE MEJORA', 'PUNTOS DE EQUIPO', 'INDICE DE COMPETITIVIDAD',
                            'CONSISTENCIA DE PUNTOS', 'PROMEDIO POSICIONES TEMPORADA', 'PROGRESION DE MEJORAS',
-                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNIVERSE', 'CARRERAS TOTALES EN F1',
+                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNVIERSE', 'CARRERAS TOTALES EN F1',
                            'CARRERAS TOTALES EN F2', 'CARRERAS TOTALES EN F3', 'CARRERAS EN RED BULL', 'CARRERAS EN FERRARI',
                            'CARRERAS EN MERCEDES', 'CARRERAS EN MCLAREN', 'CARRERAS EN ASTON', 'CARRERAS EN WILLIAMS',
                            'CARRERAS EN ALPINE', 'CARRERAS EN ALPHA ROMEO', 'CARRERAS EN ALPHA TAURI', 'CARRERAS EN HAAS',
@@ -68,57 +64,35 @@ if submit_button:
     resultado_pos = hacer_prediccion(modelo_pos, datos)
     resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
 
-    # Guardar en el historial de predicciones
-    prediccion = {
-        'ID': piloto_id,
-        'Pista': pista,
-        'Categoría': categoria,
-        'Predicción de Posición': resultado_pos[0],
-        'Predicción de Tiempo de Vuelta': resultado_fast2[0]
-    }
-    historial_predicciones.append(prediccion)
-
     # Mostrar los resultados
     st.write(f"Predicción de posición para ID {piloto_id} en {pista}: {resultado_pos[0]}")
     st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {resultado_fast2[0]} segundos")
 
-    # Exportar resultados
-    if st.button('Exportar Resultados'):
-        df_historial = pd.DataFrame(historial_predicciones)
-        df_historial.to_csv('historial_predicciones.csv', index=False)
-        st.write('Resultados exportados a `historial_predicciones.csv`')
+    # Opcional: Comparar con otros pilotos
+    comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
+    if len(comparar) > 1:
+        comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
+        comparacion_datos = comparacion_datos[columnas_necesarias]
+        comparacion_datos = comparacion_datos.apply(pd.to_numeric, errors='coerce')
 
-# Mostrar el historial de predicciones
-st.write("Historial de Predicciones")
-st.dataframe(historial_predicciones)
-
-# Dashboard Interactivo
-st.write("Dashboard Interactivo")
-comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique())
-
-if comparar:
-    comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
-    comparacion_datos = comparacion_datos[columnas_necesarias]
-    comparacion_datos = comparacion_datos.apply(pd.to_numeric, errors='coerce')
-
-    comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
-    comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
-    
-    # Mostrar la comparación
-    comparacion_datos['Predicción de Posición'] = comparacion_pos
-    comparacion_datos['Predicción de Tiempo de Vuelta'] = comparacion_fast2
-    
-    st.write("Comparación de Predicciones:")
-    st.dataframe(comparacion_datos[['ID', 'Predicción de Posición', 'Predicción de Tiempo de Vuelta']])
-    
-    # Gráfico de Comparación
-    fig, ax = plt.subplots()
-    for id_piloto in comparar:
-        datos_piloto = comparacion_datos[comparacion_datos['ID'] == id_piloto]
-        ax.plot(datos_piloto['PISTA'], datos_piloto['Predicción de Tiempo de Vuelta'], marker='o', label=id_piloto)
-    
-    ax.set_title("Comparación de Tiempos de Vuelta")
-    ax.set_xlabel("Pista")
-    ax.set_ylabel("Tiempo de Vuelta (segundos)")
-    ax.legend()
-    st.pyplot(fig)
+        comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
+        comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
+        
+        # Mostrar la comparación
+        comparacion_datos['Predicción de Posición'] = comparacion_pos
+        comparacion_datos['Predicción de Tiempo de Vuelta'] = comparacion_fast2
+        
+        st.write("Comparación de Predicciones:")
+        st.dataframe(comparacion_datos[['ID', 'Predicción de Posición', 'Predicción de Tiempo de Vuelta']])
+        
+        # Gráfico de Comparación
+        fig, ax = plt.subplots()
+        for id_piloto in comparar:
+            datos_piloto = comparacion_datos[comparacion_datos['ID'] == id_piloto]
+            ax.plot(datos_piloto['PISTA'], datos_piloto['Predicción de Tiempo de Vuelta'], marker='o', label=id_piloto)
+        
+        ax.set_title("Comparación de Tiempos de Vuelta")
+        ax.set_xlabel("Pista")
+        ax.set_ylabel("Tiempo de Vuelta (segundos)")
+        ax.legend()
+        st.pyplot(fig)
