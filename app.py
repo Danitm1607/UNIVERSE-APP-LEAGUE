@@ -38,9 +38,31 @@ if submit_button:
     # Filtrar por ID, PISTA y CAT.
     datos_filtrados = df[(df['ID'] == piloto_id) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
 
-    # Crear el DataFrame de entrada para el modelo
+    # Crear el DataFrame de entrada para el modelo con columnas exactas
     datos = datos_filtrados.copy()
-    # Añadir cualquier otra lógica necesaria aquí
+    columnas_necesarias = ['NUMERO REGISTRO', 'ID', 'PILOTO', 'CAT.', 'ESCUDERIA', 'TEMP', 'PAÍS', 'PISTA',
+                           'TERM', 'PUN', 'FAST', 'FAST2', 'PROMEDIO PUNTOS', 'MEDIANA PUNTOS',
+                           'DESVIACION PUNTOS', 'PROMEDIO POSICION', 'MEDIANA POSICION', 'DESVIACION POSICION',
+                           'PROMEDIO VUELTA', 'MEDIANA VUELTA', 'DESVIACION VUELTA', 'DESVIACION VUELTA PILOTO', 
+                           'PROMEDIO TIEMPO VUELTA POR PISTA', 'PROM PUNTOS POR TEMPORADA', 'NUM DNF PILOTO', 
+                           'PROMEDIO PUNTOS ESCUDERIA POR TEMPORADA', 'PROMEDIO PUNTOS POR ESCUDERIA',
+                           'PROMEDIO PUNTOS PILOTO ESCUDERIA', 'NUMERO DE CARRERAS FINALIZADAS', 'PUNTOS POR CARRERA FINALIZADA',
+                           'DIF VUELTAS CARRERA', 'PROMEDIO VUELTA PILOTO POR PISTA', 'MEJOR TIEMPO PILOTO PISTA',
+                           'PEOR TIEMPO PILOTO PISTA', 'FRECUENCIA DE MEJORA', 'PUNTOS DE EQUIPO', 'INDICE DE COMPETITIVIDAD',
+                           'CONSISTENCIA DE PUNTOS', 'PROMEDIO POSICIONES TEMPORADA', 'PROGRESION DE MEJORAS',
+                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNVIERSE', 'CARRERAS TOTALES EN F1',
+                           'CARRERAS TOTALES EN F2', 'CARRERAS TOTALES EN F3', 'CARRERAS EN RED BULL', 'CARRERAS EN FERRARI',
+                           'CARRERAS EN MERCEDES', 'CARRERAS EN MCLAREN', 'CARRERAS EN ASTON', 'CARRERAS EN WILLIAMS',
+                           'CARRERAS EN ALPINE', 'CARRERAS EN ALPHA ROMEO', 'CARRERAS EN ALPHA TAURI', 'CARRERAS EN HAAS',
+                           'PUNTOS TOTALES EN UNIVERSE', 'PUNTOS TOTALES EN F1', 'PUNTOS TOTALES EN F2', 'PUNTOS TOTALES EN F3',
+                           'PUNTOS EN TEMPORADA 1', 'PUNTOS EN TEMPORADA 2', 'PUNTOS EN TEMPORADA 3', 'PUNTOS TEMPORADA 4',
+                           'PUNTOS TEMPORADA 5', 'PUNTOS TEMPORADA 6', 'PROMEDIO DE PUNTOS F1', 'PROMEDIO DE PUNTOS F2',
+                           'PROMEDIO DE PUNTOS F3', 'VICTORIAS TOTALES UNIVERSE', 'VICTORIAS TOTALES F1',
+                           'VICTORIAS TOTALES F2', 'VICTORIAS TOTALES F3', 'PODIOS TOTALES UNIVERSE', 'PODIOS TOTALES UNIVERSE F1',
+                           'PODIOS TOTALES UNIVERSE F2', 'PODIOS TOTALES UNIVERSE F3']
+    
+    # Asegurarse de que el DataFrame tiene todas las columnas necesarias
+    datos = datos[columnas_necesarias]
 
     resultado_pos = hacer_prediccion(modelo_pos, datos)
     resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
