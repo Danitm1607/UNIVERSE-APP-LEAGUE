@@ -1,6 +1,7 @@
 import pickle
 import pandas as pd
 import streamlit as st
+from sklearn.preprocessing import LabelEncoder
 
 # Función para cargar los modelos
 def cargar_modelo(modelo_path):
@@ -71,6 +72,12 @@ pilotos = [
     'SANTIAGO CANOSA', 'MICHAEL DIAZGRANADOS', 'GNUREDSOX'
 ]
 
+# Codificar las variables categóricas
+le_pilotos = LabelEncoder()
+le_pilotos.fit(pilotos)
+le_pistas = LabelEncoder()
+le_pistas.fit(pistas)
+
 # Interfaz de Streamlit
 st.title("Predicciones de F1")
 
@@ -83,11 +90,10 @@ with st.form(key='prediccion_form'):
 # Verificar si se ha enviado el formulario
 if submit_button:
     if piloto and pista:
-        # Aquí debes crear el dataframe basado en el nombre del piloto y la pista seleccionada
-        # Por simplicidad, vamos a crear un dataframe de ejemplo
+        # Crear el dataframe basado en el nombre del piloto y la pista seleccionada
         datos = pd.DataFrame({
-            'piloto': [piloto],
-            'pista': [pista],
+            'piloto': [le_pilotos.transform([piloto])[0]],
+            'pista': [le_pistas.transform([pista])[0]],
             'caracteristica1': [1],  # Reemplaza con las características reales
             'caracteristica2': [2],
             'caracteristica3': [3],
@@ -98,8 +104,15 @@ if submit_button:
         resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
         resultado_pos = hacer_prediccion(modelo_pos, datos.values)
 
+        # Agregar predicciones al DataFrame original
+        datos['prediccion_pos'] = resultado_pos
+        datos['prediccion_fast2'] = resultado_fast2
+
         # Mostrar resultados
         st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
         st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
+        
+        # Mostrar el DataFrame con las predicciones
+        st.dataframe(datos)
     else:
         st.error("Por favor, ingresa el nombre del piloto y selecciona una pista.")
