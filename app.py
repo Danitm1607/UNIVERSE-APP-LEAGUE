@@ -14,12 +14,6 @@ with open('Modelo_ML_Fast2.pkl', 'rb') as file:
 def hacer_prediccion(modelo, datos):
     return modelo.predict(datos)
 
-# Función para convertir segundos a formato MM:SS
-def convertir_tiempo(segundos):
-    minutos = int(segundos // 60)
-    segundos_restantes = segundos % 60
-    return f"{minutos}m {segundos_restantes:.2f}s"
-
 # Interfaz de Streamlit
 st.title("Predicciones de F1")
 
@@ -66,11 +60,10 @@ if submit_button:
 
     resultado_pos = hacer_prediccion(modelo_pos, datos)
     resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
-    tiempo_formateado = convertir_tiempo(resultado_fast2[0])
 
     # Mostrar los resultados
     st.write(f"Predicción de posición para ID {piloto_id} en {pista}: {resultado_pos[0]}")
-    st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {tiempo_formateado}")
+    st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {resultado_fast2[0]} segundos")
 
     # Opcional: Comparar con otros pilotos
     comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
@@ -81,7 +74,7 @@ if submit_button:
         
         # Mostrar la comparación
         comparacion_datos['Predicción de Posición'] = comparacion_pos
-        comparacion_datos['Predicción de Tiempo de Vuelta'] = [convertir_tiempo(tiempo) for tiempo in comparacion_fast2]
+        comparacion_datos['Predicción de Tiempo de Vuelta'] = comparacion_fast2
         
         st.write("Comparación de Predicciones:")
         st.dataframe(comparacion_datos[['ID', 'Predicción de Posición', 'Predicción de Tiempo de Vuelta']])
@@ -94,6 +87,6 @@ if submit_button:
         
         ax.set_title("Comparación de Tiempos de Vuelta")
         ax.set_xlabel("Pista")
-        ax.set_ylabel("Tiempo de Vuelta (MM:SS)")
+        ax.set_ylabel("Tiempo de Vuelta (segundos)")
         ax.legend()
         st.pyplot(fig)
