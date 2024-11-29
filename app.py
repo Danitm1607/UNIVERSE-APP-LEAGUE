@@ -92,12 +92,26 @@ if submit_button:
     if piloto and pista:
         # Crear el dataframe basado en el nombre del piloto y la pista seleccionada
         datos = pd.DataFrame({
-            'piloto': [le_pilotos.transform([piloto])[0]],
-            'pista': [le_pistas.transform([pista])[0]],
-            'caracteristica1': [1],  # Reemplaza con las características reales
-            'caracteristica2': [2],
-            'caracteristica3': [3],
-            # Agrega más características necesarias
+            'NUMERO REGISTRO': [1],  # Reemplaza con los valores reales
+            'TEMP': [2021],  # Reemplaza con los valores reales
+            'FECHA': ['2021-03-28'],  # Reemplaza con los valores reales
+            'POS': [1],  # Reemplaza con los valores reales
+            'PUN': [25],  # Reemplaza con los valores reales
+            'FAST': [1],  # Reemplaza con los valores reales
+            'FAST2': [1],  # Reemplaza con los valores reales
+            'PROMEDIO PUNTOS': [10.5],  # Reemplaza con los valores reales
+            'MEDIANA PUNTOS': [10],  # Reemplaza con los valores reales
+            'DESVIACION PUNTOS': [3.2],  # Reemplaza con los valores reales
+            'PROMEDIO POSICION': [4.5],  # Reemplaza con los valores reales
+            'MEDIANA POSICION': [4],  # Reemplaza con los valores reales
+            'DESVIACION POSICION': [2.1],  # Reemplaza con los valores reales
+            'PROMEDIO VUELTA': [1.30],  # Reemplaza con los valores reales
+            'MEDIANA VUELTA': [1.29],  # Reemplaza con los valores reales
+            'DESVIACION VUELTA': [0.02],  # Reemplaza con los valores reales
+            'DESVIACION VUELTA PILOTO': [0.01],  # Reemplaza con los valores reales
+            'PROMEDIO TIEMPO VUELTA POR PISTA': [1.31],  # Reemplaza con los valores reales
+            'PROM PUNTOS POR TEMPORADA': [100],  # Reemplaza con los valores reales
+            'NUM DNF PILOTO': [0]  # Reemplaza con los valores reales
         })
 
         # Hacer predicciones
