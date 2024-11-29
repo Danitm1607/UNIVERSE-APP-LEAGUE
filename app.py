@@ -58,9 +58,6 @@ if submit_button:
     # Asegurarse de que el DataFrame tiene todas las columnas necesarias
     datos = datos[columnas_necesarias]
 
-    # Convertir todas las columnas a numéricas
-    datos = datos.apply(pd.to_numeric, errors='coerce')
-
     resultado_pos = hacer_prediccion(modelo_pos, datos)
     resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
 
@@ -72,9 +69,6 @@ if submit_button:
     comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
     if len(comparar) > 1:
         comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
-        comparacion_datos = comparacion_datos[columnas_necesarias]
-        comparacion_datos = comparacion_datos.apply(pd.to_numeric, errors='coerce')
-
         comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
         comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
         
