@@ -44,7 +44,7 @@ if submit_button:
                            'DIF VUELTAS CARRERA', 'PROMEDIO VUELTA PILOTO POR PISTA', 'MEJOR TIEMPO PILOTO PISTA',
                            'PEOR TIEMPO PILOTO PISTA', 'FRECUENCIA DE MEJORA', 'PUNTOS DE EQUIPO', 'INDICE DE COMPETITIVIDAD',
                            'CONSISTENCIA DE PUNTOS', 'PROMEDIO POSICIONES TEMPORADA', 'PROGRESION DE MEJORAS',
-                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNVIERSE', 'CARRERAS TOTALES EN F1',
+                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNIVERSE', 'CARRERAS TOTALES EN F1',
                            'CARRERAS TOTALES EN F2', 'CARRERAS TOTALES EN F3', 'CARRERAS EN RED BULL', 'CARRERAS EN FERRARI',
                            'CARRERAS EN MERCEDES', 'CARRERAS EN MCLAREN', 'CARRERAS EN ASTON', 'CARRERAS EN WILLIAMS',
                            'CARRERAS EN ALPINE', 'CARRERAS EN ALPHA ROMEO', 'CARRERAS EN ALPHA TAURI', 'CARRERAS EN HAAS',
@@ -58,9 +58,14 @@ if submit_button:
     # Asegurarse de que el DataFrame tiene todas las columnas necesarias
     datos = datos[columnas_necesarias]
 
+    # Reemplazar valores no numéricos o nulos con el valor de la mediana de la columna
+    for col in datos.columns:
+        if datos[col].dtype == 'object':
+            datos[col] = pd.to_numeric(datos[col], errors='coerce')
+        datos[col].fillna(datos[col].median(), inplace=True)
+
     # Verificar si todas las columnas son numéricas
-    try:
-        datos = datos.astype(float)
+    if datos.isnull().sum().sum() == 0 and datos.dtypes.eq('float').all():
         resultado_pos = hacer_prediccion(modelo_pos, datos)
         resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
 
@@ -72,6 +77,11 @@ if submit_button:
         comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
         if len(comparar) > 1:
             comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
+            for col in comparacion_datos.columns:
+                if comparacion_datos[col].dtype == 'object':
+                    comparacion_datos[col] = pd.to_numeric(comparacion_datos[col], errors='coerce')
+                comparacion_datos[col].fillna(comparacion_datos[col].median(), inplace=True)
+
             comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
             comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
             
@@ -93,5 +103,5 @@ if submit_button:
             ax.set_ylabel("Tiempo de Vuelta (segundos)")
             ax.legend()
             st.pyplot(fig)
-    except ValueError:
-        st.error("Algunas columnas contienen valores no numéricos o nulos. Por favor, verifica los datos de entrada.")
+    else:
+        st.error("No se pudieron convertir todas las columnas a numéricas o hay valores nulos restantes. Por favor, verifica los datos de entrada.")
