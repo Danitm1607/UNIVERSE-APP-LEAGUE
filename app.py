@@ -94,7 +94,6 @@ if submit_button:
         datos = pd.DataFrame({
             'NUMERO REGISTRO': [1],  # Reemplaza con los valores reales
             'TEMP': [2021],  # Reemplaza con los valores reales
-            'FECHA': ['2021-03-28'],  # Reemplaza con los valores reales
             'POS': [1],  # Reemplaza con los valores reales
             'PUN': [25],  # Reemplaza con los valores reales
             'FAST': [1],  # Reemplaza con los valores reales
@@ -115,8 +114,8 @@ if submit_button:
         })
 
         # Hacer predicciones
-        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
-        resultado_pos = hacer_prediccion(modelo_pos, datos.values)
+        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.drop(columns=['FECHA']).values)
+        resultado_pos = hacer_prediccion(modelo_pos, datos.drop(columns=['FECHA']).values)
 
         # Agregar predicciones al DataFrame original
         datos['prediccion_pos'] = resultado_pos
