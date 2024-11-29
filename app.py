@@ -1,131 +1,115 @@
 import pickle
 import pandas as pd
 import streamlit as st
-from sklearn.preprocessing import LabelEncoder
-
-# Función para cargar los modelos
-def cargar_modelo(modelo_path):
-    try:
-        with open(modelo_path, 'rb') as file:
-            modelo = pickle.load(file)
-        st.write(f"Modelo {modelo_path} cargado correctamente")
-        return modelo
-    except FileNotFoundError:
-        st.error(f"No se encontró el archivo {modelo_path}")
-    except Exception as e:
-        st.error(f"Error al cargar {modelo_path}: {e}")
-    return None
 
 # Cargar los modelos
-modelo_fast2 = cargar_modelo('modelo_fast2.pkl')
-modelo_pos = cargar_modelo('modelo_pos.pkl')
+with open('Modelo_ML_Pos.pkl', 'rb') as file:
+    modelo_pos = pickle.load(file)
+
+with open('Modelo_ML_Fast2.pkl', 'rb') as file:
+    modelo_fast2 = pickle.load(file)
 
 # Función para hacer predicciones
 def hacer_prediccion(modelo, datos):
-    if modelo is not None:
-        try:
-            return modelo.predict(datos)
-        except Exception as e:
-            st.error(f"Error al hacer predicción: {e}")
-    else:
-        return "Modelo no cargado correctamente"
-
-# Crear una lista de pistas disponibles
-pistas = [
-    'Abu Dhabi', 'Australia', 'Austria', 'Bahrein', 'Baku', 'Belgica',
-    'Brasil', 'Canada', 'China', 'España', 'Estados Unidos', 'Francia',
-    'Holanda', 'Inglaterra', 'Japón', 'Jeddah', 'Las Vegas', 'Mexico',
-    'Miami', 'Monaco', 'Monza', 'Portugal', 'Qatar', 'Singapur'
-]
-
-# Crear una lista de pilotos disponibles
-pilotos = [
-    'ERICK 195352', 'TXSHURAXX', 'ELPAPURRI540', 'BMR-ADRIAN', 'MXMARIANO',
-    'JAMES ORTIZ9763', 'NICOMAGALDI1985', 'SKY-SEVERAL', 'STEBAN_FBE', 'DANTERO22',
-    'ALUCARDADRI', 'FULLLEGEND741', 'DANITM1607', 'METPAPICHULO', 'ITSRAMSES15',
-    'SKY WIZBAND', 'LUCACEDE98', 'ADANBGAYMER', 'DIEGOTZE2000', 'SATED-FOOTMARK1',
-    'NICOGONJIM', 'MANOLO765', 'RODOOGAMES', 'AKALVLO', 'LPR STREAK', 'EFS RACING',
-    'SEBAS33311', 'SKY-FXSTEER', 'VASCOOL_911', 'ISAIFACUNDO', 'DBARCELONA87967',
-    'CARLX9779', 'D I E G OPRO892', 'ALVAROG226', 'GERAMEDRA11', 'JPZMIX',
-    'EMMAFOREVER_20', 'JONATHANKYADK89', 'JOTAPE_ORTIZ', 'FREDY1178', 'JAREDMUNDO07',
-    'SLPZ333', 'MAGNATE 963211', 'YXDAN', 'FLRA_1992', 'NICO_MAGALDI1985', 'LUIS_OHH-02',
-    'AZTK CHUCHO6', 'DANII30101993', 'E_TEJERO7', 'HECTORPAS11', 'KRISTIANLUNA1',
-    'YAHIR0511', 'AVILA5609', 'CESARLEOF1', 'INF_ALAN', 'ANGEELBTW', 'ALEJOLEAL',
-    'JOSHUA1866', 'THE ALEXG', 'BOOMMER5264', 'DANILO2204', 'KYLO_CL', 'METEORO_GN10',
-    'SRS ARTURMAN', 'TURCIOSERWIN6', 'GORDOCRISTIAN14', 'XAVISALAZAR182', 'S4NT8MOON',
-    'PAULOLIVAS16', 'GIANFOXRIDER', 'XXWARRIORXX8918', 'KILLERA11AN', 'JOSMANU2004',
-    'THEYUKIGAMEZ', 'DAJOSO31', 'STRUCKLEONJR', 'WISECOIN', 'XEL_PIKANTEMAXX_',
-    'CTRCAPITANCM', 'MLC YOSOYCHRIS', 'SPOKGANG', 'SANTYVELASKEZ', 'BRUNO UBERA',
-    'RONALDRMR', 'JOSEPHSANCHEZ22', 'TIIC ASGAR', 'JOSEANTONIOVR-99', 'XARISTOTELESX',
-    'VISIBLEXXX', 'HYBRIDBR1', 'JH14ZS', 'SKY JUMP6615', 'JUAN3DCF', 'SAMDEVIL',
-    'EMICHROCKYT', 'LVR CRIS', 'PAULRASVZLA', 'CFC_EZEQUIEL_14', 'MONTANAS4460',
-    'ROCKSTAR239376', 'TVC ARCANGEL', 'JG EDU4RD0', 'KARMA2090', 'VG AS3S1N0',
-    'ISAAAC ARS', 'THEOMYFOR', 'HUGO ARCHILLA', 'BRANDONGAMER885', 'EDU_RAMIREZ13',
-    'RINZLER_VRTX', 'ZTR SNAKE', 'ONE', 'KIKEMADRID8', 'DELUXEE-PLAY', 'NAYIBSK',
-    'MARCO ZOSAYA', 'LLXE_MRERICK', 'JJOJ1201', 'THEKINGSONRRIKS', 'ALM_XDD',
-    'ALANJACK10', 'RAG0MU01', 'JUANKF14', 'WFC105', 'PAPOROCK2021', 'TIIC MUCINO',
-    'VANTONIOBART', 'ALUJANC', 'AMENRIV021', 'PAOLO', 'CESARGP-17', 'CRL LALO',
-    'IDX KRISTHIAN RIVERA', 'ANTONY FLORES', 'DOREONIX', 'CF1OMARLO8', 'LKR-TINGLING',
-    'TRIANA ANDRES', 'NCR-CIENFUEGOS', 'CYPHER', 'B4SAL W4RR10R', 'TIICDRAKO812',
-    'JEFEMAESTROF1', 'XLR8R', 'LAMQ-ZARC', 'DTR ATLAS20', 'EMMABYTWT', 'THEONE_1117',
-    'MAVERICK1122', 'LEONARDO062799', 'MENA-S98', 'AZAREDCS1604223', 'CALAN10',
-    'SANTIAGO CANOSA', 'MICHAEL DIAZGRANADOS', 'GNUREDSOX'
-]
-
-# Codificar las variables categóricas
-le_pilotos = LabelEncoder()
-le_pilotos.fit(pilotos)
-le_pistas = LabelEncoder()
-le_pistas.fit(pistas)
+    return modelo.predict(datos)
 
 # Interfaz de Streamlit
 st.title("Predicciones de F1")
 
-# Formulario para ingresar nombre del piloto y seleccionar pista
+# Formulario de entrada
 with st.form(key='prediccion_form'):
-    piloto = st.selectbox("Selecciona el Piloto", pilotos)
-    pista = st.selectbox("Selecciona la Pista", pistas)
-    submit_button = st.form_submit_button(label='Buscar')
+    piloto = st.selectbox("Selecciona el Piloto", ['Dani', 'Fer', 'Vascool', 'Otro'])
+    pista = st.selectbox("Selecciona la Pista", ['Qatar', 'Inglaterra', 'España', 'Otro'])
+    temp = st.number_input("Temporada", min_value=1, step=1)
+    puntos = st.number_input("Puntos", min_value=0, step=1)
+    submit_button = st.form_submit_button(label='Hacer Predicción')
 
-# Verificar si se ha enviado el formulario
+# Procesar formulario
 if submit_button:
-    if piloto and pista:
-        # Crear el dataframe basado en el nombre del piloto y la pista seleccionada
-        datos = pd.DataFrame({
-            'NUMERO REGISTRO': [1],  # Reemplaza con los valores reales
-            'TEMP': [2021],  # Reemplaza con los valores reales
-            'POS': [1],  # Reemplaza con los valores reales
-            'PUN': [25],  # Reemplaza con los valores reales
-            'FAST': [1],  # Reemplaza con los valores reales
-            'FAST2': [1],  # Reemplaza con los valores reales
-            'PROMEDIO PUNTOS': [10.5],  # Reemplaza con los valores reales
-            'MEDIANA PUNTOS': [10],  # Reemplaza con los valores reales
-            'DESVIACION PUNTOS': [3.2],  # Reemplaza con los valores reales
-            'PROMEDIO POSICION': [4.5],  # Reemplaza con los valores reales
-            'MEDIANA POSICION': [4],  # Reemplaza con los valores reales
-            'DESVIACION POSICION': [2.1],  # Reemplaza con los valores reales
-            'PROMEDIO VUELTA': [1.30],  # Reemplaza con los valores reales
-            'MEDIANA VUELTA': [1.29],  # Reemplaza con los valores reales
-            'DESVIACION VUELTA': [0.02],  # Reemplaza con los valores reales
-            'DESVIACION VUELTA PILOTO': [0.01],  # Reemplaza con los valores reales
-            'PROMEDIO TIEMPO VUELTA POR PISTA': [1.31],  # Reemplaza con los valores reales
-            'PROM PUNTOS POR TEMPORADA': [100],  # Reemplaza con los valores reales
-            'NUM DNF PILOTO': [0]  # Reemplaza con los valores reales
-        })
+    # Crear el DataFrame de entrada para el modelo
+    datos = pd.DataFrame({
+        'NUMERO REGISTRO': [1],  # Reemplaza con valores reales
+        'ID': [1],  # Reemplaza con valores reales
+        'PILOTO': [1],  # Reemplaza con valores reales
+        'CAT.': [0],  # Reemplaza con valores reales
+        'ESCUDERIA': [1],  # Reemplaza con valores reales
+        'TEMP': [temp],
+        'PAÍS': [1],  # Reemplaza con valores reales
+        'PISTA': [1],  # Reemplaza con valores reales
+        'TERM': [1],  # Reemplaza con valores reales
+        'PUN': [puntos],
+        'FAST': [1.5],  # Reemplaza con valores reales
+        'FAST2': [1.5],  # Reemplaza con valores reales
+        'PROMEDIO PUNTOS': [10.5],
+        'MEDIANA PUNTOS': [10],
+        'DESVIACION PUNTOS': [3.2],
+        'PROMEDIO POSICION': [4.5],
+        'MEDIANA POSICION': [4],
+        'DESVIACION POSICION': [2.1],
+        'PROMEDIO VUELTA': [1.3],
+        'MEDIANA VUELTA': [1.29],
+        'DESVIACION VUELTA': [0.02],
+        'DESVIACION VUELTA PILOTO': [0.01],
+        'PROMEDIO TIEMPO VUELTA POR PISTA': [1.31],
+        'PROM PUNTOS POR TEMPORADA': [100],
+        'NUM DNF PILOTO': [0],
+        'PROMEDIO PUNTOS ESCUDERIA POR TEMPORADA': [10.5],
+        'PROMEDIO PUNTOS POR ESCUDERIA': [10.5],
+        'PROMEDIO PUNTOS PILOTO ESCUDERIA': [10.5],
+        'NUMERO DE CARRERAS FINALIZADAS': [20],
+        'PUNTOS POR CARRERA FINALIZADA': [5],
+        'DIF VUELTAS CARRERA': [0.01],
+        'PROMEDIO VUELTA PILOTO POR PISTA': [1.3],
+        'MEJOR TIEMPO PILOTO PISTA': [1.28],
+        'PEOR TIEMPO PILOTO PISTA': [1.35],
+        'FRECUENCIA DE MEJORA': [0.5],
+        'PUNTOS DE EQUIPO': [200],
+        'INDICE DE COMPETITIVIDAD': [0.5],
+        'CONSISTENCIA DE PUNTOS': [0.5],
+        'PROMEDIO POSICIONES TEMPORADA': [10],
+        'PROGRESION DE MEJORAS': [0.5],
+        'RELACION PUNTOS POSICION': [0.5],
+        'CARRERAS TOTALES EN UNVIERSE': [30],
+        'CARRERAS TOTALES EN F1': [20],
+        'CARRERAS TOTALES EN F2': [10],
+        'CARRERAS TOTALES EN F3': [5],
+        'CARRERAS EN RED BULL': [10],
+        'CARRERAS EN FERRARI': [5],
+        'CARRERAS EN MERCEDES': [7],
+        'CARRERAS EN MCLAREN': [8],
+        'CARRERAS EN ASTON': [6],
+        'CARRERAS EN WILLIAMS': [2],
+        'CARRERAS EN ALPINE': [3],
+        'CARRERAS EN ALPHA ROMEO': [1],
+        'CARRERAS EN ALPHA TAURI': [4],
+        'CARRERAS EN HAAS': [0],
+        'PUNTOS TOTALES EN UNIVERSE': [300],
+        'PUNTOS TOTALES EN F1': [200],
+        'PUNTOS TOTALES EN F2': [80],
+        'PUNTOS TOTALES EN F3': [20],
+        'PUNTOS EN TEMPORADA 1': [50],
+        'PUNTOS EN TEMPORADA 2': [60],
+        'PUNTOS EN TEMPORADA 3': [70],
+        'PUNTOS TEMPORADA 4': [80],
+        'PUNTOS TEMPORADA 5': [90],
+        'PUNTOS TEMPORADA 6': [100],
+        'PROMEDIO DE PUNTOS F1': [10.5],
+        'PROMEDIO DE PUNTOS F2': [8.5],
+        'PROMEDIO DE PUNTOS F3': [5.5],
+        'VICTORIAS TOTALES UNIVERSE': [5],
+        'VICTORIAS TOTALES F1': [3],
+        'VICTORIAS TOTALES F2': [1],
+        'VICTORIAS TOTALES F3': [1],
+        'PODIOS TOTALES UNIVERSE': [10],
+        'PODIOS TOTALES UNIVERSE F1': [7],
+        'PODIOS TOTALES UNIVERSE F2': [2],
+        'PODIOS TOTALES UNIVERSE F3': [1]
+    })
 
-        # Hacer predicciones
-        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.drop(columns=['FECHA']).values)
-        resultado_pos = hacer_prediccion(modelo_pos, datos.drop(columns=['FECHA']).values)
+    # Hacer las predicciones
+    resultado_pos = hacer_prediccion(modelo_pos, datos)
+    resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
 
-        # Agregar predicciones al DataFrame original
-        datos['prediccion_pos'] = resultado_pos
-        datos['prediccion_fast2'] = resultado_fast2
-
-        # Mostrar resultados
-        st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
-        st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
-        
-        # Mostrar el DataFrame con las predicciones
-        st.dataframe(datos)
-    else:
-        st.error("Por favor, ingresa el nombre del piloto y selecciona una pista.")
+    # Mostrar los resultados
+    st.write(f"Predicción de posición para {piloto} en {pista}: {resultado_pos[0]}")
+    st.write(f"Predicción de tiempo de vuelta para {piloto} en {pista}: {resultado_fast2[0]}")
