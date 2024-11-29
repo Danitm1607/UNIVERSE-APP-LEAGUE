@@ -41,7 +41,34 @@ pistas = [
 pilotos = [
     'ERICK 195352', 'TXSHURAXX', 'ELPAPURRI540', 'BMR-ADRIAN', 'MXMARIANO',
     'JAMES ORTIZ9763', 'NICOMAGALDI1985', 'SKY-SEVERAL', 'STEBAN_FBE', 'DANTERO22',
-    # Agrega los demás pilotos aquí...
+    'ALUCARDADRI', 'FULLLEGEND741', 'DANITM1607', 'METPAPICHULO', 'ITSRAMSES15',
+    'SKY WIZBAND', 'LUCACEDE98', 'ADANBGAYMER', 'DIEGOTZE2000', 'SATED-FOOTMARK1',
+    'NICOGONJIM', 'MANOLO765', 'RODOOGAMES', 'AKALVLO', 'LPR STREAK', 'EFS RACING',
+    'SEBAS33311', 'SKY-FXSTEER', 'VASCOOL_911', 'ISAIFACUNDO', 'DBARCELONA87967',
+    'CARLX9779', 'D I E G OPRO892', 'ALVAROG226', 'GERAMEDRA11', 'JPZMIX',
+    'EMMAFOREVER_20', 'JONATHANKYADK89', 'JOTAPE_ORTIZ', 'FREDY1178', 'JAREDMUNDO07',
+    'SLPZ333', 'MAGNATE 963211', 'YXDAN', 'FLRA_1992', 'NICO_MAGALDI1985', 'LUIS_OHH-02',
+    'AZTK CHUCHO6', 'DANII30101993', 'E_TEJERO7', 'HECTORPAS11', 'KRISTIANLUNA1',
+    'YAHIR0511', 'AVILA5609', 'CESARLEOF1', 'INF_ALAN', 'ANGEELBTW', 'ALEJOLEAL',
+    'JOSHUA1866', 'THE ALEXG', 'BOOMMER5264', 'DANILO2204', 'KYLO_CL', 'METEORO_GN10',
+    'SRS ARTURMAN', 'TURCIOSERWIN6', 'GORDOCRISTIAN14', 'XAVISALAZAR182', 'S4NT8MOON',
+    'PAULOLIVAS16', 'GIANFOXRIDER', 'XXWARRIORXX8918', 'KILLERA11AN', 'JOSMANU2004',
+    'THEYUKIGAMEZ', 'DAJOSO31', 'STRUCKLEONJR', 'WISECOIN', 'XEL_PIKANTEMAXX_',
+    'CTRCAPITANCM', 'MLC YOSOYCHRIS', 'SPOKGANG', 'SANTYVELASKEZ', 'BRUNO UBERA',
+    'RONALDRMR', 'JOSEPHSANCHEZ22', 'TIIC ASGAR', 'JOSEANTONIOVR-99', 'XARISTOTELESX',
+    'VISIBLEXXX', 'HYBRIDBR1', 'JH14ZS', 'SKY JUMP6615', 'JUAN3DCF', 'SAMDEVIL',
+    'EMICHROCKYT', 'LVR CRIS', 'PAULRASVZLA', 'CFC_EZEQUIEL_14', 'MONTANAS4460',
+    'ROCKSTAR239376', 'TVC ARCANGEL', 'JG EDU4RD0', 'KARMA2090', 'VG AS3S1N0',
+    'ISAAAC ARS', 'THEOMYFOR', 'HUGO ARCHILLA', 'BRANDONGAMER885', 'EDU_RAMIREZ13',
+    'RINZLER_VRTX', 'ZTR SNAKE', 'ONE', 'KIKEMADRID8', 'DELUXEE-PLAY', 'NAYIBSK',
+    'MARCO ZOSAYA', 'LLXE_MRERICK', 'JJOJ1201', 'THEKINGSONRRIKS', 'ALM_XDD',
+    'ALANJACK10', 'RAG0MU01', 'JUANKF14', 'WFC105', 'PAPOROCK2021', 'TIIC MUCINO',
+    'VANTONIOBART', 'ALUJANC', 'AMENRIV021', 'PAOLO', 'CESARGP-17', 'CRL LALO',
+    'IDX KRISTHIAN RIVERA', 'ANTONY FLORES', 'DOREONIX', 'CF1OMARLO8', 'LKR-TINGLING',
+    'TRIANA ANDRES', 'NCR-CIENFUEGOS', 'CYPHER', 'B4SAL W4RR10R', 'TIICDRAKO812',
+    'JEFEMAESTROF1', 'XLR8R', 'LAMQ-ZARC', 'DTR ATLAS20', 'EMMABYTWT', 'THEONE_1117',
+    'MAVERICK1122', 'LEONARDO062799', 'MENA-S98', 'AZAREDCS1604223', 'CALAN10',
+    'SANTIAGO CANOSA', 'MICHAEL DIAZGRANADOS', 'GNUREDSOX'
 ]
 
 # Interfaz de Streamlit
@@ -56,22 +83,23 @@ with st.form(key='prediccion_form'):
 # Verificar si se ha enviado el formulario
 if submit_button:
     if piloto and pista:
-        # Aquí debes cargar el dataframe con las características necesarias
-        # Asumiendo que 'dataframe_con_predicciones_ajustado_codificado' es el dataframe correcto
-        datos = dataframe_con_predicciones_ajustado_codificado[
-            (dataframe_con_predicciones_ajustado_codificado['piloto'] == piloto) &
-            (dataframe_con_predicciones_ajustado_codificado['pista'] == pista)
-        ]
-        
-        if not datos.empty:
-            # Hacer predicciones
-            resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
-            resultado_pos = hacer_prediccion(modelo_pos, datos.values)
+        # Aquí debes crear el dataframe basado en el nombre del piloto y la pista seleccionada
+        # Por simplicidad, vamos a crear un dataframe de ejemplo
+        datos = pd.DataFrame({
+            'piloto': [piloto],
+            'pista': [pista],
+            'caracteristica1': [1],  # Reemplaza con las características reales
+            'caracteristica2': [2],
+            'caracteristica3': [3],
+            # Agrega más características necesarias
+        })
 
-            # Mostrar resultados
-            st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
-            st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
-        else:
-            st.error(f"No se encontraron datos para {piloto} en {pista}.")
+        # Hacer predicciones
+        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
+        resultado_pos = hacer_prediccion(modelo_pos, datos.values)
+
+        # Mostrar resultados
+        st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
+        st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
     else:
         st.error("Por favor, ingresa el nombre del piloto y selecciona una pista.")
