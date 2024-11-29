@@ -1,107 +1,118 @@
 import pickle
 import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+
+# Función para cargar los modelos
+def cargar_modelo(modelo_path):
+    try:
+        with open(modelo_path, 'rb') as file:
+            modelo = pickle.load(file)
+        st.write(f"Modelo {modelo_path} cargado correctamente")
+        return modelo
+    except FileNotFoundError:
+        st.error(f"No se encontró el archivo {modelo_path}")
+    except Exception as e:
+        st.error(f"Error al cargar {modelo_path}: {e}")
+    return None
 
 # Cargar los modelos
-with open('Modelo_ML_Pos.pkl', 'rb') as file:
-    modelo_pos = pickle.load(file)
-
-with open('Modelo_ML_Fast2.pkl', 'rb') as file:
-    modelo_fast2 = pickle.load(file)
+modelo_fast2 = cargar_modelo('modelo_fast2.pkl')
+modelo_pos = cargar_modelo('modelo_pos.pkl')
 
 # Función para hacer predicciones
 def hacer_prediccion(modelo, datos):
-    return modelo.predict(datos)
+    if modelo is not None:
+        try:
+            return modelo.predict(datos)
+        except Exception as e:
+            st.error(f"Error al hacer predicción: {e}")
+    else:
+        return "Modelo no cargado correctamente"
+
+# Crear una lista de pistas disponibles
+pistas = [
+    'Abu Dhabi', 'Australia', 'Austria', 'Bahrein', 'Baku', 'Belgica',
+    'Brasil', 'Canada', 'China', 'España', 'Estados Unidos', 'Francia',
+    'Holanda', 'Inglaterra', 'Japón', 'Jeddah', 'Las Vegas', 'Mexico',
+    'Miami', 'Monaco', 'Monza', 'Portugal', 'Qatar', 'Singapur'
+]
+
+# Crear una lista de pilotos disponibles
+pilotos = [
+    'ERICK 195352', 'TXSHURAXX', 'ELPAPURRI540', 'BMR-ADRIAN', 'MXMARIANO',
+    'JAMES ORTIZ9763', 'NICOMAGALDI1985', 'SKY-SEVERAL', 'STEBAN_FBE', 'DANTERO22',
+    'ALUCARDADRI', 'FULLLEGEND741', 'DANITM1607', 'METPAPICHULO', 'ITSRAMSES15',
+    'SKY WIZBAND', 'LUCACEDE98', 'ADANBGAYMER', 'DIEGOTZE2000', 'SATED-FOOTMARK1',
+    'NICOGONJIM', 'MANOLO765', 'RODOOGAMES', 'AKALVLO', 'LPR STREAK', 'EFS RACING',
+    'SEBAS33311', 'SKY-FXSTEER', 'VASCOOL_911', 'ISAIFACUNDO', 'DBARCELONA87967',
+    'CARLX9779', 'D I E G OPRO892', 'ALVAROG226', 'GERAMEDRA11', 'JPZMIX',
+    'EMMAFOREVER_20', 'JONATHANKYADK89', 'JOTAPE_ORTIZ', 'FREDY1178', 'JAREDMUNDO07',
+    'SLPZ333', 'MAGNATE 963211', 'YXDAN', 'FLRA_1992', 'NICO_MAGALDI1985', 'LUIS_OHH-02',
+    'AZTK CHUCHO6', 'DANII30101993', 'E_TEJERO7', 'HECTORPAS11', 'KRISTIANLUNA1',
+    'YAHIR0511', 'AVILA5609', 'CESARLEOF1', 'INF_ALAN', 'ANGEELBTW', 'ALEJOLEAL',
+    'JOSHUA1866', 'THE ALEXG', 'BOOMMER5264', 'DANILO2204', 'KYLO_CL', 'METEORO_GN10',
+    'SRS ARTURMAN', 'TURCIOSERWIN6', 'GORDOCRISTIAN14', 'XAVISALAZAR182', 'S4NT8MOON',
+    'PAULOLIVAS16', 'GIANFOXRIDER', 'XXWARRIORXX8918', 'KILLERA11AN', 'JOSMANU2004',
+    'THEYUKIGAMEZ', 'DAJOSO31', 'STRUCKLEONJR', 'WISECOIN', 'XEL_PIKANTEMAXX_',
+    'CTRCAPITANCM', 'MLC YOSOYCHRIS', 'SPOKGANG', 'SANTYVELASKEZ', 'BRUNO UBERA',
+    'RONALDRMR', 'JOSEPHSANCHEZ22', 'TIIC ASGAR', 'JOSEANTONIOVR-99', 'XARISTOTELESX',
+    'VISIBLEXXX', 'HYBRIDBR1', 'JH14ZS', 'SKY JUMP6615', 'JUAN3DCF', 'SAMDEVIL',
+    'EMICHROCKYT', 'LVR CRIS', 'PAULRASVZLA', 'CFC_EZEQUIEL_14', 'MONTANAS4460',
+    'ROCKSTAR239376', 'TVC ARCANGEL', 'JG EDU4RD0', 'KARMA2090', 'VG AS3S1N0',
+    'ISAAAC ARS', 'THEOMYFOR', 'HUGO ARCHILLA', 'BRANDONGAMER885', 'EDU_RAMIREZ13',
+    'RINZLER_VRTX', 'ZTR SNAKE', 'ONE', 'KIKEMADRID8', 'DELUXEE-PLAY', 'NAYIBSK',
+    'MARCO ZOSAYA', 'LLXE_MRERICK', 'JJOJ1201', 'THEKINGSONRRIKS', 'ALM_XDD',
+    'ALANJACK10', 'RAG0MU01', 'JUANKF14', 'WFC105', 'PAPOROCK2021', 'TIIC MUCINO',
+    'VANTONIOBART', 'ALUJANC', 'AMENRIV021', 'PAOLO', 'CESARGP-17', 'CRL LALO',
+    'IDX KRISTHIAN RIVERA', 'ANTONY FLORES', 'DOREONIX', 'CF1OMARLO8', 'LKR-TINGLING',
+    'TRIANA ANDRES', 'NCR-CIENFUEGOS', 'CYPHER', 'B4SAL W4RR10R', 'TIICDRAKO812',
+    'JEFEMAESTROF1', 'XLR8R', 'LAMQ-ZARC', 'DTR ATLAS20', 'EMMABYTWT', 'THEONE_1117',
+    'MAVERICK1122', 'LEONARDO062799', 'MENA-S98', 'AZAREDCS1604223', 'CALAN10',
+    'SANTIAGO CANOSA', 'MICHAEL DIAZGRANADOS', 'GNUREDSOX'
+]
+
+# Codificar las variables categóricas
+le_pilotos = LabelEncoder()
+le_pilotos.fit(pilotos)
+le_pistas = LabelEncoder()
+le_pistas.fit(pistas)
 
 # Interfaz de Streamlit
 st.title("Predicciones de F1")
 
-# Leer el archivo de datos para obtener las opciones de ID y PISTA
-df = pd.read_csv('databaseuniverse (1).csv', delimiter=';')
-
-# Formulario de entrada
+# Formulario para ingresar nombre del piloto y seleccionar pista
 with st.form(key='prediccion_form'):
-    piloto_id = st.selectbox("Selecciona el ID del Piloto", df['ID'].unique())
-    pista = st.selectbox("Selecciona la Pista", df['PISTA'].unique())
-    categoria = st.selectbox("Selecciona la Categoría", df['CAT.'].unique())
-    submit_button = st.form_submit_button(label='Hacer Predicción')
+    piloto = st.selectbox("Selecciona el Piloto", pilotos)
+    pista = st.selectbox("Selecciona la Pista", pistas)
+    submit_button = st.form_submit_button(label='Buscar')
 
-# Procesar formulario
+# Verificar si se ha enviado el formulario
 if submit_button:
-    # Filtrar por ID, PISTA y CAT.
-    datos_filtrados = df[(df['ID'] == piloto_id) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
+    if piloto and pista:
+        # Crear el dataframe basado en el nombre del piloto y la pista seleccionada
+        datos = pd.DataFrame({
+            'piloto': [le_pilotos.transform([piloto])[0]],
+            'pista': [le_pistas.transform([pista])[0]],
+            'caracteristica1': [1],  # Reemplaza con las características reales
+            'caracteristica2': [2],
+            'caracteristica3': [3],
+            # Agrega más características necesarias
+        })
 
-    # Crear el DataFrame de entrada para el modelo con columnas exactas
-    datos = datos_filtrados.copy()
-    columnas_necesarias = ['NUMERO REGISTRO', 'ID', 'PILOTO', 'CAT.', 'ESCUDERIA', 'TEMP', 'PAÍS', 'PISTA',
-                           'TERM', 'PUN', 'FAST', 'FAST2', 'PROMEDIO PUNTOS', 'MEDIANA PUNTOS',
-                           'DESVIACION PUNTOS', 'PROMEDIO POSICION', 'MEDIANA POSICION', 'DESVIACION POSICION',
-                           'PROMEDIO VUELTA', 'MEDIANA VUELTA', 'DESVIACION VUELTA', 'DESVIACION VUELTA PILOTO', 
-                           'PROMEDIO TIEMPO VUELTA POR PISTA', 'PROM PUNTOS POR TEMPORADA', 'NUM DNF PILOTO', 
-                           'PROMEDIO PUNTOS ESCUDERIA POR TEMPORADA', 'PROMEDIO PUNTOS POR ESCUDERIA',
-                           'PROMEDIO PUNTOS PILOTO ESCUDERIA', 'NUMERO DE CARRERAS FINALIZADAS', 'PUNTOS POR CARRERA FINALIZADA',
-                           'DIF VUELTAS CARRERA', 'PROMEDIO VUELTA PILOTO POR PISTA', 'MEJOR TIEMPO PILOTO PISTA',
-                           'PEOR TIEMPO PILOTO PISTA', 'FRECUENCIA DE MEJORA', 'PUNTOS DE EQUIPO', 'INDICE DE COMPETITIVIDAD',
-                           'CONSISTENCIA DE PUNTOS', 'PROMEDIO POSICIONES TEMPORADA', 'PROGRESION DE MEJORAS',
-                           'RELACION PUNTOS POSICION', 'CARRERAS TOTALES EN UNIVERSE', 'CARRERAS TOTALES EN F1',
-                           'CARRERAS TOTALES EN F2', 'CARRERAS TOTALES EN F3', 'CARRERAS EN RED BULL', 'CARRERAS EN FERRARI',
-                           'CARRERAS EN MERCEDES', 'CARRERAS EN MCLAREN', 'CARRERAS EN ASTON', 'CARRERAS EN WILLIAMS',
-                           'CARRERAS EN ALPINE', 'CARRERAS EN ALPHA ROMEO', 'CARRERAS EN ALPHA TAURI', 'CARRERAS EN HAAS',
-                           'PUNTOS TOTALES EN UNIVERSE', 'PUNTOS TOTALES EN F1', 'PUNTOS TOTALES EN F2', 'PUNTOS TOTALES EN F3',
-                           'PUNTOS EN TEMPORADA 1', 'PUNTOS EN TEMPORADA 2', 'PUNTOS EN TEMPORADA 3', 'PUNTOS TEMPORADA 4',
-                           'PUNTOS TEMPORADA 5', 'PUNTOS TEMPORADA 6', 'PROMEDIO DE PUNTOS F1', 'PROMEDIO DE PUNTOS F2',
-                           'PROMEDIO DE PUNTOS F3', 'VICTORIAS TOTALES UNIVERSE', 'VICTORIAS TOTALES F1',
-                           'VICTORIAS TOTALES F2', 'VICTORIAS TOTALES F3', 'PODIOS TOTALES UNIVERSE', 'PODIOS TOTALES UNIVERSE F1',
-                           'PODIOS TOTALES UNIVERSE F2', 'PODIOS TOTALES UNIVERSE F3']
-    
-    # Asegurarse de que el DataFrame tiene todas las columnas necesarias
-    datos = datos[columnas_necesarias]
+        # Hacer predicciones
+        resultado_fast2 = hacer_prediccion(modelo_fast2, datos.values)
+        resultado_pos = hacer_prediccion(modelo_pos, datos.values)
 
-    # Reemplazar valores no numéricos o nulos con el valor de la mediana de la columna
-    for col in datos.columns:
-        if datos[col].dtype == 'object':
-            datos[col] = pd.to_numeric(datos[col], errors='coerce')
-        datos[col].fillna(datos[col].median(), inplace=True)
+        # Agregar predicciones al DataFrame original
+        datos['prediccion_pos'] = resultado_pos
+        datos['prediccion_fast2'] = resultado_fast2
 
-    # Verificar si todas las columnas son numéricas
-    if datos.isnull().sum().sum() == 0 and datos.dtypes.eq('float').all():
-        resultado_pos = hacer_prediccion(modelo_pos, datos)
-        resultado_fast2 = hacer_prediccion(modelo_fast2, datos)
-
-        # Mostrar los resultados
-        st.write(f"Predicción de posición para ID {piloto_id} en {pista}: {resultado_pos[0]}")
-        st.write(f"Predicción de tiempo de vuelta para ID {piloto_id} en {pista}: {resultado_fast2[0]} segundos")
-
-        # Opcional: Comparar con otros pilotos
-        comparar = st.multiselect("Comparar con otros IDs", df['ID'].unique(), default=[piloto_id])
-        if len(comparar) > 1:
-            comparacion_datos = df[(df['ID'].isin(comparar)) & (df['PISTA'] == pista) & (df['CAT.'] == categoria)]
-            for col in comparacion_datos.columns:
-                if comparacion_datos[col].dtype == 'object':
-                    comparacion_datos[col] = pd.to_numeric(comparacion_datos[col], errors='coerce')
-                comparacion_datos[col].fillna(comparacion_datos[col].median(), inplace=True)
-
-            comparacion_pos = hacer_prediccion(modelo_pos, comparacion_datos)
-            comparacion_fast2 = hacer_prediccion(modelo_fast2, comparacion_datos)
-            
-            # Mostrar la comparación
-            comparacion_datos['Predicción de Posición'] = comparacion_pos
-            comparacion_datos['Predicción de Tiempo de Vuelta'] = comparacion_fast2
-            
-            st.write("Comparación de Predicciones:")
-            st.dataframe(comparacion_datos[['ID', 'Predicción de Posición', 'Predicción de Tiempo de Vuelta']])
-            
-            # Gráfico de Comparación
-            fig, ax = plt.subplots()
-            for id_piloto in comparar:
-                datos_piloto = comparacion_datos[comparacion_datos['ID'] == id_piloto]
-                ax.plot(datos_piloto['PISTA'], datos_piloto['Predicción de Tiempo de Vuelta'], marker='o', label=id_piloto)
-            
-            ax.set_title("Comparación de Tiempos de Vuelta")
-            ax.set_xlabel("Pista")
-            ax.set_ylabel("Tiempo de Vuelta (segundos)")
-            ax.legend()
-            st.pyplot(fig)
+        # Mostrar resultados
+        st.write(f"Pronóstico de posición para {piloto} en {pista}:", resultado_pos)
+        st.write(f"Pronóstico de tiempo de vuelta para {piloto} en {pista}:", resultado_fast2)
+        
+        # Mostrar el DataFrame con las predicciones
+        st.dataframe(datos)
     else:
-        st.error("No se pudieron convertir todas las columnas a numéricas o hay valores nulos restantes. Por favor, verifica los datos de entrada.")
+        st.error("Por favor, ingresa el nombre del piloto y selecciona una pista.")
